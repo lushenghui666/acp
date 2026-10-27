@@ -354,6 +354,10 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
       </div>
       <div class="setinfo" id="cfgInfo"></div>
       <div class="actions">
+        <button class="btn ghost" id="btnResume" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v8h8"/></svg>
+          继续上次练习
+        </button>
         <button class="btn primary" id="btnStart">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 3 14 9-14 9V3z"/></svg>
           开始练习
@@ -3347,6 +3351,16 @@ function initHome(){
   upd();
   document.getElementById('btnStart').onclick = startFromHome;
   document.getElementById('hsTotal').textContent = ALLQS.length;
+  /* 首页：检测未完成练习 → 显示“继续上次练习” */
+  var rb = document.getElementById('btnResume');
+  var rsnap = load(PRAC_LS, null);
+  if (rsnap && rsnap.ids && rsnap.ids.length){    var rdone = 0;
+    (rsnap.picked||[]).forEach(function(a){ if (a && a.length) rdone++; });
+    rb.style.display = '';
+    rb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v8h8"/></svg>'
+      + '继续上次练习（已作答 ' + rdone + '/' + rsnap.ids.length + '）';
+    rb.onclick = function(){ PR.restore(true); };
+  }
 }
 function startFromHome(){
   var v = document.getElementById('cfgSet').value|0;
@@ -3405,6 +3419,13 @@ var S = {
     this.mode = opt.mode || 'practice';
     this.examCfg = opt.examCfg || null;
     this.finished = false;
+    /* 练习进度还原：逐题判分的历史锁定题 */
+    if (opt.practVerdicts && this.mode === 'practice'){
+      for (var pv=0; pv<opt.practVerdicts.length && pv<this.verdicts.length; pv++){
+        var v0 = opt.practVerdicts[pv];
+        if (v0) this.verdicts[pv] = { ok:!!v0.ok, got:v0.got||'', std:v0.std||'' };
+      }
+    }
     if (this.mode === 'exam'){
       var deadline = opt.deadline || (Date.now() + ((this.examCfg && this.examCfg.min) ? this.examCfg.min : 120)*60000);
       this.deadline = deadline;
@@ -3412,6 +3433,8 @@ var S = {
     } else {
       this.deadline = null;
       EX.idle();
+      /* 新开的练习会话：清旧进度档（restore 路径已恢复现场，不再保留原档） */
+      if (typeof PR !== 'undefined') PR.dump();
     }
     go('quiz'); this.render();
   },
@@ -3690,6 +3713,8 @@ var S = {
       }
       S.open(S.qs, S.instant, S.label);
     };
+    /* 完成本次练习/考试：清练习进度档，防止下次误续 */
+    if (isExam){ localStorage.removeItem(EXAM_LS); } else { PR.dump(); }
     this.destroy();
     go('result');
     renderHomeStats(); renderStats();
@@ -3712,6 +3737,62 @@ function setStatsTouch(sid, ok){
   var s = setStats[sid] || (setStats[sid] = {r:0,t:0});
   s.t++; if (ok) s.r++;
 }
+
+/* ---------- 练习进度管理器 PR：退出不丢进度 ---------- */
+var PRAC_LS = 'zp_prac_v1';
+var PR = {
+  save: function(){
+    if (S.mode !== 'practice' || S.finished) return;
+    if (!S.qs || !S.qs.length || !S.label) return; /* 无进行中的练习会话（初始态/结果页）不落盘 */
+    var snap = {
+      ids: S.qs.map(function(q){ return qid(q); }),
+      picked: S.picked.map(function(a){ return a.slice(); }),
+      verdicts: S.verdicts.map(function(v){ return v ? { ok:v.ok, got:v.got, std:v.std } : null; }),
+      idx: S.idx,
+      instant: !!S.instant,
+      t0: S.t0,
+      rightCnt: S.rightCnt || 0,
+      label: S.label
+    };
+    save(PRAC_LS, snap);
+  },
+  restore: function(silent){
+    var snap = load(PRAC_LS, null);
+    if (!snap || !snap.ids || !snap.ids.length) return false;
+    var qs = snap.ids.map(function(id){ return qByQid(id); });
+    if (!qs.length || qs.length !== snap.ids.length){
+      localStorage.removeItem(PRAC_LS);
+      return false;
+    }
+    var done = 0;
+    for (var i=0;i<snap.picked.length;i++){
+      if (snap.picked[i] && snap.picked[i].length) done++;
+    }
+    var goRestore = function(){
+      S.open(qs, snap.instant !== false, snap.label || '练习', {
+        mode: 'practice',
+        picked: snap.picked ? snap.picked.map(function(a){ return a ? a.slice() : []; }) : null,
+        idx: snap.idx|0,
+        t0: snap.t0 || Date.now(),
+        rightCnt: snap.rightCnt|0,
+        practVerdicts: snap.verdicts
+      });
+      /* 恢复后立刻重存一次（S.open 会清旧档，这里补回，直接关页也不丢） */
+      PR.save();
+      S.render();
+    };
+    if (silent){ goRestore(); return true; }
+    var msg = '检测到未完成的练习「' + (snap.label || '练习') + '」\n已作答 ' + done + ' / ' + snap.ids.length + ' 题，要继续吗？';
+    ask(msg, goRestore, '继续', function(){
+      localStorage.removeItem(PRAC_LS);
+      toast('已作废练习进度');
+      var rb = document.getElementById('btnResume');
+      if (rb) rb.style.display = 'none';
+    });
+    return true;
+  },
+  dump: function(){ localStorage.removeItem(PRAC_LS); }
+};
 
 /* ---------- 键盘 ---------- */
 document.addEventListener('keydown', function(e){
@@ -3752,7 +3833,13 @@ document.getElementById('btnQuit').onclick = function(){
     }, '放弃考试');
     return;
   }
-  ask('确定放弃本次练习吗？未完成的题将不记录。', function(){
+  if (S.finished) { go('home'); renderHomeStats(); return; }
+  /* 练习中途退出：保留进度，下次打开继续 */
+  PR.save();
+  ask('保留本次练习进度吗？下次打开将从此处继续。', function(){
+    go('home'); renderHomeStats();
+  }, '保留并退出', function(){
+    PR.save();
     go('home'); renderHomeStats();
   });
 };
@@ -4004,21 +4091,23 @@ var _origFinish = S.finish.bind(S);
     return b ? b.dataset.k : 'full';
   }
   /* 考试中自动快照（防止意外关页） */
-  document.addEventListener('visibilitychange', function(){ if (document.hidden) EX.save(); });
-  window.addEventListener('beforeunload', function(){ EX.save(); });
-  /* 键选后静默保存 */
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) { EX.save(); PR.save(); } });
+  window.addEventListener('beforeunload', function(){ EX.save(); PR.save(); });
+  /* 键选/判题后静默保存（考试+练习两模式） */
   var boxObs = document.getElementById('qOpts');
-  boxObs.addEventListener('click', function(){ if (S.mode === 'exam') EX.save(); });
+  boxObs.addEventListener('click', function(){ if (S.mode === 'exam') EX.save(); else PR.save(); });
+  document.getElementById('btnConfirm').addEventListener('click', function(){ if (S.mode === 'practice') PR.save(); });
+  document.getElementById('btnPrev').addEventListener('click', function(){ if (S.mode === 'practice') PR.save(); });
   /* 中途非考试离开 quiz 页面（如改地址栏）不清档，交卷时清 */
   var _origGo = go;
-  /* 未完成考试存档检测：进入页面时提示 */
+  /* 进页检测：未完成考试弹续考提示（考试有时限优先级高）；练习不弹窗，走首页“继续上次练习”按钮 */
   setTimeout(function(){ EX.restore(); }, 300);
 
   initHome();
   renderHomeStats();
   refreshPill();
   window.go = go;
-  window.EX = EX; window.S = S; window.pickExam = pickExam;
+  window.EX = EX; window.S = S; window.PR = PR; window.pickExam = pickExam;
 })();
 
 </script>
