@@ -158,7 +158,7 @@ select:focus{outline:2px solid rgba(61,127,214,.35);border-color:var(--blue)}
 .opt.wrongpick .mark{background:#f9dedb;color:#9c3a37}
 
 .verdict{
-  margin-top:16px;border-radius:12px;padding:13px 16px;font-size:14px;display:flex;gap:10px;align-items:flex-start;
+  margin-top:16px;border-radius:12px;padding:13px 16px;font-size:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;
   border:1px solid transparent;animation:fade .2s;
 }
 .verdict.ok{background:var(--ok-bg);border-color:#cdeedd;color:#1e6e42}
@@ -167,6 +167,16 @@ select:focus{outline:2px solid rgba(61,127,214,.35);border-color:var(--blue)}
 .verdict .vd{flex:1}
 .verdict .vd .wrong-note{display:none;font-size:12.5px;margin-top:4px;opacity:.85}
 .verdict.bad .vd .wrong-note{display:block}
+/* 题解展示（判分横幅/错题本/结果页） */
+.vexp{display:block;flex:0 0 100%;width:100%;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.15);font-size:12.5px;line-height:1.75;opacity:.92}
+.verdict.ok .vexp{border-top-color:rgba(30,110,66,.25)}
+.verdict.bad .vexp{border-top-color:rgba(156,58,55,.25)}
+.iexp{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:12.5px;line-height:1.75;background:#f2f6fc;border-radius:9px;padding:9px 12px;color:var(--ink-2)}
+.iexp .lbl{flex:none;color:var(--blue-d);font-weight:700;padding-top:1px}
+.iexp span:not(.lbl){flex:1}
+.eexp{width:100%;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.75;color:var(--ink-2);display:flex;gap:8px;align-items:flex-start}
+.eexp .lbl{flex:none;color:var(--blue-d);font-weight:700;padding-top:1px}
+@media(max-width:560px){.iexp,.eexp{font-size:12px}}
 .quiz-foot{display:flex;gap:10px;margin-top:18px;align-items:center}
 .quiz-foot .sp{flex:1}
 #btnConfirm{min-width:130px}
@@ -191,12 +201,12 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 .res-list-title{font-size:13.5px;font-weight:700;color:var(--ink-2);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
 .res-err{display:flex;flex-direction:column;gap:8px}
 .res-err .row{
-  display:flex;gap:10px;align-items:flex-start;font-size:14px;background:#fff;border:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;font-size:14px;background:#fff;border:1px solid var(--line);
   border-radius:10px;padding:10px 14px;
 }
 .res-err .row b{color:var(--bad);flex:none}
 .res-err .row .a{margin-left:auto;color:var(--ink-3);font-size:12.5px;flex:none}
-@media(max-width:560px){.res-err .row{flex-wrap:wrap}.res-err .row .a{margin-left:0}}
+@media(max-width:560px){.res-err .row .a{margin-left:0}}
 
 /* ---------- 列表通用 ---------- */
 .list{display:flex;flex-direction:column;gap:12px}
@@ -211,6 +221,7 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 }
 .itag.multi{background:var(--gold-bg);color:#9a7b13}
 .itag.ok{background:var(--ok-bg);color:#1e6e42}
+.itag.bad{background:var(--bad-bg);color:#9c3a37}
 .irow{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;flex-wrap:wrap}
 .irow .lbl{color:var(--ink-3);flex:none}
 .irow .lbl.weak{color:#b9c6d4}
@@ -269,8 +280,12 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 #exNav .exnum{border:1px solid #dfe7f0;background:#fff;border-radius:8px;min-width:34px;height:30px;font-size:13px;color:#7286a0;cursor:pointer;padding:0}
 #exNav .exnum:hover{border-color:var(--line);color:var(--ink)}
 #exNav .exnum.done{background:#e9f2fc;border-color:#bcd7f4;color:#2c5fa8}
-#exNav .exnum.cur{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
-#exNav .exnum.done.cur{background:var(--primary);color:#fff}
+#exNav .exnum.ok{background:var(--ok-bg);border-color:#b7e2c6;color:#1e6e42}
+#exNav .exnum.bad{background:var(--bad-bg);border-color:#f0c8c5;color:#9c3a37}
+#exNav .exnum.cur{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+#exNav .exnum.done.cur{background:var(--blue);color:#fff;border-color:var(--blue)}
+#exNav .exnum.ok.cur{background:var(--blue);color:#fff;border-color:var(--blue)}
+#exNav .exnum.bad.cur{background:var(--blue);color:#fff;border-color:var(--blue)}
 #examDesc{white-space:normal;line-height:1.7}
 footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b7c5d4;text-align:center}
 </style>
@@ -286,25 +301,29 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
       <div>智算认证刷题练习<small>ACP · 大模型应用方向 · 200题</small></div>
     </div>
     <nav class="tabs" id="tabs">
-      <button class="tab on" data-v="home">
+      <button class="tab on" data-v="prac">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 8h7M9 12h7"/></svg>
         练习
+      </button>
+      <button class="tab" data-v="exam">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        考试模拟
       </button>
       <button class="tab" data-v="wrong">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 4.4A9 9 0 1 0 21 12"/><path d="M21 3v6h-6"/><path d="m9 13 3 3 8-8" stroke-linejoin="round"/></svg>
         错题本<span class="pill" id="wrongPill"></span>
       </button>
-      <button class="tab" data-v="stats">
+        <button class="tab" data-v="records">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg>
-        统计
+        考试记录
       </button>
     </nav>
   </div>
 </header>
 
 <main>
-  <!-- ===== 首页 ===== -->
-  <section class="view on" id="view-home">
+  <!-- ===== 练习 ===== -->
+  <section class="view on" id="view-prac">
     <div class="home-top">
       <div class="stat"><b id="hsTotal">200</b><span>题库总量</span></div>
       <div class="stat"><b id="hsDone">0</b><span>已练习题次</span></div>
@@ -365,6 +384,24 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
       </div>
     </div>
     <div class="card" style="margin-top:14px">
+      <h2 class="sect" style="margin-bottom:12px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg>
+        各练习集正确率
+      </h2>
+      <div id="statsBars"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2 class="sect" style="margin-bottom:12px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        最近做题记录
+      </h2>
+      <div class="list" id="statsRecent"></div>
+    </div>
+  </section>
+
+  <!-- ===== 考试模拟 ===== -->
+  <section class="view" id="view-exam">
+    <div class="card">
       <h2 class="sect">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
         模拟考试
@@ -405,7 +442,6 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
       <pre class="code" id="qCode" style="display:none"></pre>
       <div class="opts" id="qOpts"></div>
       <div class="verdict" id="qVerdict" style="display:none"></div>
-      <div class="exnav-wrap" id="exNav" style="display:none"></div>
       <div class="quiz-foot">
         <button class="btn danger sm" id="btnQuit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -419,6 +455,7 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
         <button class="btn primary" id="btnConfirm">确认答案</button>
         <button class="btn primary" id="exSubmit" style="display:none;background:linear-gradient(135deg,#2456c4,#3d7fd6)">交卷</button>
       </div>
+      <div class="exnav-wrap" id="exNav" style="display:none"></div>
       <div class="kbd-tip" id="kbdTip">按 <kbd>1</kbd>-<kbd>5</kbd> 选择选项，<kbd>Enter</kbd> 确认 / 下一题</div>
     </div>
   </section>
@@ -444,13 +481,14 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
       <div class="actions" id="resActs" style="margin-top:16px">
         <button class="btn primary" id="btnAgain">再练一遍</button>
         <button class="btn ghost" id="btnGoWrong">练本次错题</button>
-        <button class="btn ghost" onclick="go('home')">返回首页</button>
+        <button class="btn ghost" onclick="go('prac')">返回练习页</button>
       </div>
     </div>
   </section>
 
   <!-- ===== 错题本 ===== -->
   <section class="view" id="view-wrong">
+    <div class="home-top" id="wrongCards"></div>
     <div class="card" style="margin-bottom:14px">
       <h2 class="sect" style="margin-bottom:10px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 4.4A9 9 0 1 0 21 12"/><path d="M21 3v6h-6"/><path d="m9 13 3 3 8-8"/></svg>
@@ -468,22 +506,15 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
     <div class="list" id="wrongList"></div>
   </section>
 
-  <!-- ===== 统计 ===== -->
-  <section class="view" id="view-stats">
-    <div class="home-top" id="statsCards"></div>
-    <div class="card" style="margin-bottom:14px">
-      <h2 class="sect" style="margin-bottom:12px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg>
-        各练习集正确率
-      </h2>
-      <div id="statsBars"></div>
-    </div>
+  <!-- ===== 考试记录 ===== -->
+  <section class="view" id="view-records">
+    <div class="home-top" id="recCards"></div>
     <div class="card">
       <h2 class="sect" style="margin-bottom:12px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-        最近练习记录
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/><path d="M7 4h10v6a5 5 0 0 1-10 0V4z"/></svg>
+        成绩列表
       </h2>
-      <div class="list" id="statsRecent"></div>
+      <div class="list" id="recList"></div>
     </div>
   </section>
 </main>
@@ -498,6 +529,213 @@ footer{max-width:960px;margin:0 auto;padding:0 18px 34px;font-size:12px;color:#b
 /* ===================== 题库 ===================== */
 var BANK = [];
 function addSet(i, title, arr){ BANK.push({i:i, t:title, qs:arr}); }
+
+/* ===================== 题解（题号 "套-题" → 解析文本） ===================== */
+var EXPL = {
+"1-1": "API Key 写在代码里会随源码泄露（提交仓库、打包分发均会带出密钥）。环境变量把密钥与代码分离：代码中只读变量，不落任何明文。A 的“加密存入注释”密钥仍在代码里且注释常被剥离去掉保护；C 拼接只是混淆；D 上传公开文档等于直接泄露。",
+"1-2": "非流式（一次性返回）要等全部生成完才可见；把 stream 打开（见 Q7），模型逐段推送，用户 1 秒内就开始看到内容，体感延迟大幅下降。带宽、temperature、权限等级都改变不了“整段等完”这一事实。",
+"1-3": "通义千问 API 本身无状态：服务端不记忆上一轮对话。要实现多轮，就要把历史对话放进 messages 一起发送，让模型“看到”上下文。B/C 是采样参数、与记忆无关；D 代价过高且答非所问。",
+"1-4": "输出雷同、缺乏多样性 → 需要更大的随机性。temperature 越高分布越“平”，选词越发散多样，1.5 属于明显调高（0.2 会更收敛，top_p=0.3 收窄候选，固定 seed 反而每次都一样）。",
+"1-5": "医疗场景要求确定性输出：temperature=0（近乎贪心）+top_p 极小，把采样空间压到最窄，同一问题稳定复现同一答案。A 仍随机；B 本身就高随机；D 的 seed 只在特定 API 支持、且 top_p=0.5 仍偏随机，不如 C 极端收敛。",
+"1-6": "私域知识不在参数里、模型答不了。RAG 只需把 docx 接入索引即可回答，无需训练，成本最低、见效最快。A 重训模型代价高；C 买更高版本也学不到公司内部文档；D 人工模板无法穷举问题，维护代价大。",
+"1-7": "流式输出的开关就是 stream 参数：stream=True 才会把内容逐块返回。stream=False 是关闭（A 反了）；temperature/top_p（C/D）与是否流式无关。",
+"1-8": "切片+向量化是 RAG 的检索基石：文本变向量后才能按语义相似度召回，大幅提高检索效率与召回质量。目的不是省存储（A），也不影响训练（C），更与可视化无关（D）。",
+"1-9": "训练数据有截止时间，之后的新事实模型一无所知，只能答出旧信息；这是 RAG 要解决的典型场景。与采样参数（A/C）无关；权限（D）只影响能否调用。",
+"1-10": "求稳定 → 采样收得最窄。C：temperature=0 取最大概率词、top_p=0.1 候选极少，输出近乎确定，最适合代码生成。B/D 隐含高随机性；A 中 top_p=0.9 偏宽。",
+"1-11": "分词（Tokenization）把连续文本切成模型可处理的最小语义单元（token），是输入侧的第一步。向量化（A）在其后把 token 转为向量；概率计算（B）发生在模型内部；计算并行（D）是系统层概念。",
+"1-12": "知识库要跟业务同步：改 system prompt 里的背景知识（把新知识写进提示词）立即生效、零训练成本。A 重训代价大；C 影响的是随机性不是知识；D 流式只改展示方式不改内容。当然更彻底的做法是更新 RAG 索引，但选项中 B 是代价最低的即时方案。",
+"1-13": "先生成推理过程再给结论，正是思维链（CoT）：模型把中间推理显式写出来再收尾，是推理能力的体现。自回归（A）生成机制本身不必然带思考步骤（通用模型就不带）；流式（B）只是传输方式；D 是另一套知识注入机制。",
+"1-14": "“北京市海淀区”被切成 3 个 token，是分词阶段的直接产物——地名被拆成多个语义单元。向量化/推理/输出（A/B/D）都不产生“切块”这一动作。",
+"1-15": "给私域知识，路径只有两种：把知识放进上下文（提示词注入/RAG 拉相关片段），或写进参数（微调）。A（微调）、B（附加文档）、D（RAG）都成立；E “更高版本 API”仍不知你的私域数据；C 提高 temperature 只会更发散，与知识无关。",
+  "1-16": "选 BCE。B：temperature 通过调整概率分布的平滑程度控制随机性——温度高分布平坦、选词发散，温度低分布尖锐、输出稳定；C：top_p=0.3 即核采样只保留累计概率前 30% 的候选词，明显收窄采样范围；E：top_p 的机制本质就是控制采样集合（候选词）的大小。A 不选：“同时调整两者更好控制”只是经验性用法建议，两参作用维度重叠、叠加调节反而可能过度收窄，并非对参数特性的严格正确描述；D 错在“完全消除随机性”的绝对化——temperature=0 近乎贪心选择，实现层面仍非数学意义上的完全确定。",
+"1-17": "同一问题多次问结果不一样：内因是采样随机性（B：temperature>0 时按分布采样；D：top_k/实现层扰动；A 多副本数值差异）也会造成内容差异。C 网络延迟影响速度不影响内容；E 权限影响可用性而非答案。",
+"1-18": "RAG 的核心是“检索外部知识再生成”：向量数据库（存向量、做相似检索）和语义检索模块（召回相关片段）是骨架。流式接口（B）是输出方式；微调工具（D）、分词器（E）都不是 RAG 特有组件。",
+  "1-19": "选 ABC。A：自回归生成——下一个 token 的概率分布以已生成的全部历史为条件，模型逐步“接龙”；B：向量化把 token 映射为多维向量（多维数组），供模型内部计算使用；C：推理阶段每一步都在词表上计算下一个 token 的概率分布并采样。D 错：分词长度只反映文本切分粒度，与语义复杂度没有正相关关系；E 错：流式输出只改变传输与展示方式，不改变生成内容与质量。",
+"1-20": "私域知识要常更新（A：业务变→知识变）；长上下文记忆难保持（B：轮次一多模型记不全）是真实痛点；调用量大导致 API 费用要管控（D）。而流式输出延迟（C）属正常技术现象可优化、不算挑战；分词算法选择（E）由平台决定，用户无感。",
+"2-1": "解析后检索仍差，最可能是分块环节出了问题：各段长度差异大 → 有的段太长稀释语义、有的太短信息不足，检索命中质量下降。选 B。流式输出（A）影响展示；Key 未配置（C）会直接报错而非“效果不佳”；索引没加载（D）会导致查询失败或全空。本题考的是对“检索效果”的归因敏感度——分段策略是 RAG 检索质量的第一杠杆。",
+"2-2": "向量化（embedding）把文本变成语义空间中的向量，语义相近的文本向量距离近，检索即“找最近邻”。这是 RAG 检索阶段的根基，与生成流利度（A）、调用次数（C）、格式修复（D）无关。",
+"2-3": "VectorStoreIndex.from_documents() 的作用就是“从文档建索引”：读取→切片→向量化→建可检索的索引。选 B（解析文档并建立索引）。A 是反方向（把已有索引用起来）；C/D 与该调用无关。",
+"2-4": "用户明确问“报销流程”，RAG 却答无关内容——说明检索阶段没把相关片段召回，生成阶段“巧妇难为无米之炊”。问题定位在检索（B）。提示词模板（A）只负责生成风格；流式开关（C）、是否调 API（D）不解释“答非所问+无关”。链路定位：先查检索召回，再查生成整合。",
+"2-5": "多轮场景下，历史对话+当前提问直接拼接往往超长且指代混乱。常见方案是先用大模型把“带上下文的追问”改写成独立完整的问题（如“它”→具体实体），再交给检索引擎。CondenseQuestionChatEngine 即此思路（见 Q12）。直接拼接（A）会引入噪声；忽略历史（C）则答非所问；每次重建索引（D）成本灾难。",
+"2-6": "persist() 是把已建好的索引持久化到磁盘，下次直接加载、不用重复解析向量化。是“存”（B）不是“删”（A）；与对话记录（C）、加密（D）无关。价值在于避免重复算力，配合 Q13（响应慢先查是否重复解析）一起记忆。",
+"2-7": "提升检索准确性：检索后加 rerank（重排序）步骤——召回一批粗结果后，用专门模型对“问题-片段”相关性精排，把最相关的排到最前。A 更长的分段反而稀释语义；C 禁用 embedding 直接没法做语义检索；D 是调用频率管理。",
+"2-8": "建好索引存起来 → 每次查询直接读索引做向量检索，不必重新解析文档+重新向量化。省的是解析/嵌入的重复开销（B）。生成速度（A）属于生成阶段；训练速度（C）无关；文档修复（D）无此功能。",
+"2-9": "embed_model 决定用什么嵌入模型把文本转向量——文本向量化的模型（B）。它工作在索引/查询的向量化环节，不管生成用什么模型（A）、对话模板（C）或解析规则（D）。",
+"2-10": "问 Jira 答 Trello：知识库里没有 Jira 的内容（或未被召回），向量最接近的是 Trello 的片段——检索（B）没找到相关信息。生成模板（A）存在时最多表达不好，不会“偷换主题”；流式（C）、索引保存（D）与内容张冠李戴无关。这是检索空/错召回的典型现象，同 Q4 一个方向：检索是 RAG 质量的第一道关卡。",
+"2-11": "生成阶段拿到检索片段后，核心能力是“总结整合”：把多个片段融合成一致、完整的回答（B）。高效检索（A）属于检索阶段；自动修格式（C）、调用成本（D）不是生成阶段的核心能力定义。",
+"2-12": "CondenseQuestionChatEngine：先用大模型把对话历史+最新提问压缩改写为“独立可检索的问题”，再交给 query_engine 检索。本质是把多轮指代消解为单轮查询（B）。不是简单拼接（A），也不做删除（C）、加密（D）。",
+"2-13": "变慢先查最常见的性能坑：是否每次都在重新解析文档/重建索引，而没有持久化+加载索引（A）。提示词长度（B）影响 token 数但通常不是数量级问题；训练数据量（C）无关；提问语法（D）不影响速度。",
+"2-14": "embedding 模型的训练目标：让语义相关的文本在向量空间里距离更近（B）——对比学习拉正近负远。生成交付（A）、自动分段（C）、调用次数（D）都不是它的目标。",
+"2-15": "建索引三步：解析文档（A）→分段（B）→向量化并存储（D）。生成回复（C）属于查询阶段，不在建索引环节。",
+"2-16": "提检索准确性：更强 embedding 模型（A，向量表示更准）+rerank 精排（C）。分段更长（B）反而稀释语义降低召回精度；禁用向量库（D）直接瘫痪。",
+"2-17": "生成阶段三要素：大模型总结能力（A）、检索到的相关片段（B）、提示词模板设计（D）。原始文档格式（C）在解析阶段已消化，生成阶段无需关心。",
+"2-18": "整链路都可能出错：检索没召回（A）→生成拿到空材料；提示词模板没把检索结果放进上下文（B）→模型看不到依据；提问带指代词（C）→检索改写失败；索引路径错误（D）→加载失败。选 ABCD：四项都会导致最终答案错。",
+"2-19": "LlamaIndex 提供：文档解析+建索引（A）、多轮对话改写（C，CondenseQuestionChatEngine 等）、预置提示词模板（D）。它不训练 embedding 模型（B）——嵌入模型一般直接用现成的（text-embedding-v3 等）。库的边界：编排应用，不训模型。",
+"2-20": "分段合理性：语义完整（A：一段一个话题）+利于检索（C：段长适中、边界自然）。不是长度完全一致（B：机械等长会把语义切碎）；段落内容重叠（D）会引入重复噪声（相邻段可有少量重叠，但方向上应避免重冗）。",
+"3-1": "要求“回答中始终带工具下载链接”这类固定行为，最稳的是少样本示例（D）：给一对“输入-输出应含链接”的样例，模型模仿该模式。角色（B）、上下文（A）、任务目标（C）都不如样例直观可复制——样例即“标准答案的样子”。",
+"3-2": "### 分隔符的价值在于划界：明确告诉模型“这里开始/结束是关键内容”，减少指令与数据混淆。不提升速度（A）、不藏敏感信息（C）、不减算力（D）。",
+"3-3": "“以专业算法工程师身份……”——调整的是角色（A）。受众（B）是给谁看；样例（C）是示例；输出格式（D）是结构约束。角色决定回答的口吻、深度与视角。",
+"3-4": "要求特定格式（JSON 且仅含指定字段）→ 直接规定输出格式（D）最有效。思维链（A）帮推理不控格式；角色（B）改变口吻；分隔符（C）划界但不定义结构。",
+"3-5": "模板里给了“【样例】输入：制作书签 / 输出：材料清单、步骤说明”——一对输入输出示例，让模型按此模式回答 {query_str}。这是少样本示例（B）的标准形态：模仿样例的风格与结构。",
+"3-6": "算错差旅费用 → 让模型分步计算：先列项目、再逐项算、最后汇总。引导分步思考（D）。检索（A）是知识问题不是计算问题；分隔符（B）不改变推理方式；输出格式（C）管格式不管对错。",
+"3-7": "意图识别靠词表/规则：出现“审查/检查/评估”类关键词 → 判定文档审查。选 C（包含审查关键词）。内部工具（A）、外语（B）、需检索（D）都不是分类“文档审查”这一意图的直接依据——关键词匹配是确定性最强的依据。",
+"3-8": "推理模型（如 Qwen3 思考模式）经强化学习训练，逻辑推导更严谨（B）——多步推理、数学、代码类任务优势明显。代价通常是响应更慢（token 多）；它也支持多语言（C 通用模型同样支持）；分隔符对两类模型都建议用（D 不独占）。",
+"3-9": "通用模型最适合简单直接问答（A：考勤政策，无需多步推理）。复杂代码调试（B）、法律条款推理（C）、数学证明（D）正是推理模型的领地。记法：直接答=通用，要推=推理。",
+"3-10": "“角色：客服助手”+“回答需包含步骤说明” —— 同时限定角色和任务（C）。没定义 JSON 等输出格式（A）、没给背景资料（B 上下文）、没有输入输出样例（D）。",
+"3-11": "“检查……”命中意图识别规则中的“检查”关键词 → 归为文档审查（选 B）。虽然输入是代码，但分类依据是关键词“检查”（A 是内容特征，不是分类规则的本体）。",
+"3-12": "要结构化输出 → 最直接的指令就是“输出 JSON 格式”（D），格式约束对推理模型同样有效且更可执行。“分两步思考”（C）引导推理但不规定结构。",
+"3-13": "“用生成器表达式替代列表”是对输出内容形态的规范（写出什么样的代码），属于输出格式规范（A）。角色（B）、样例（C）、分隔符（D）都不约束“生成的代码要长什么样”。",
+"3-14": "通用模型 vs 推理模型：区别在任务处理方式（C）——推理模型先内部（或显式）展开思考链再作答；通用模型直接作答。不在于数据量（A）、插件数（B）、延迟（D 通用常更快但这是结果不是本质区别）。",
+"3-15": "提示词必备三件：任务目标（A：做什么）、输出格式（C：交付成什么样）、上下文（D：背景信息/领域约束）。模型版本（B）API 密钥（E）属于工程配置，不写在提示词里。",
+"3-16": "意图识别依据：关键词匹配（B）、知识库召回结果（C）、问题复杂度（D）都可用于分流决策。用户身份（A）用于权限控制，输出格式要求（E）是下游动作——两者都不是“识别意图”的依据。",
+"3-17": "推理模型技巧：充分背景信息（B）、角色限定（C）、思维链提示（D）、示例补充（E）。极简描述（A）对推理模型不利——它要的是完整、明确、约束清晰的题面，减法式技巧反而丢信息。",
+"3-18": "提稳定性：规定 JSON 字段（A：结构化锚定输出）、少样本示例（B：拉齐格式）、分隔符（D：分清指令与数据）。知识库召回（C）管内容覆盖率，不管格式稳定性；降 API 版本（E）与稳定性无关。",
+"3-19": "少样本作用：规范输出结构（B）、限定回答风格（C）、明确任务边界（E——样例告诉模型“要处理到什么程度”）。不提升推理速度（A）、不减资源（D）——样例还会带来额外 token 消耗。",
+  "3-20": "选 ACD。A：推理模型经推理链强化训练，数学计算、代码与多步逻辑是它的主场；C：使用推理模型时应在提示词中明确思考步骤（思维链提示），引导其展开推理；D：通用模型直接作答，简单问答场景更经济高效。B 不选：“通用模型响应更快”以偏概全，速度取决于模型规模与任务复杂度，并非两类模型的本质对比维度；E 明显错误：推理模型在通用语料基础上追加了推理数据与强化学习，训练数据并不相同。",
+"4-1": "Context Precision 低 = 相关参考片段在检索结果里排名靠后（信噪比差）。选 B。注意 D“检索到大量无关信息”是干扰项：Precision 看的是“排在前面的有多少相关”，核心是相对排名而非绝对数量；B 是 Ragas 对该指标的标准解释。",
+"4-2": "Answer Correctness = 语义相似度 25% + 事实准确度 75%（对 ground_truth 的事实核对占大头）。选 D。记忆：事实为王（3:1），语义只做锦上添花。",
+"4-3": "Context Recall 低 = 参考资料里没覆盖到 ground_truth 应有的观点 → 先查知识库完整性（C）。改写策略（B）、生成参数（D）、prompt 模板（A）都不是该指标的第一责任方——Recall 直接度量“标准答案的观点有多少能在检索结果中找到”。",
+"4-4": "test_answer 评估“回答是否有用/有效”→ 输出判定标签类结果：“有效回答”（A）。它给人看的分类结论，不是分值（C 0.85 是数值型指标的形态，不匹配该函数语义）；B/C/D 是其他环节的产物。",
+"4-5": "Ragas 必须字段：contexts（参考资料）。评估的就是“答案 vs 检索内容、ground_truth vs contexts”的关系，没有 contexts 一切指标都算不了。temperature（A）、embedding_model（B）、query_engine（C）是工程配置项，不是评估数据集的必备字段。",
+"4-6": "标准导入路径：from ragas.metrics import answer_correctness（B）。ragas.metrics 是指标的正确命名空间；chatbot/datasets/langchain（A/C/D）都不是该指标的出处。",
+"4-7": "AC 低但 CR 高：说明该召回的都召回到了（检索没问题），是生成阶段把答案写错了 → 大模型生成答案错误（C）。知识库缺信息（A）会让 CR 也低；排名错误（B）对应 CP 低；提问模糊（D）会拉低 Answer Relevancy。",
+"4-8": "Faithfulness（忠实度）：答案是否忠于参考资料、有没有编造（与参考资料的事实一致性）。选 D。它治“幻觉”：答得再流畅，跟材料不符就不是事实忠实。",
+"4-9": "语义相似度 = 余弦相似度（B）：两个向量夹角余弦衡量语义距离， embedding 后的标准做法。编辑距离（A）是字符级；关键词匹配（C）没有语义；正则（D）是文本模式工具。",
+"4-10": "Context Recall 的定义：ground_truth 中的观点，有多少能在检索到的参考资料中被覆盖（B）。分子是“被覆盖的观点”，分母是“ground_truth 全部观点”。与检索条数（A）、问题复杂度（C）、答案长度（D）无关。",
+"4-11": "test_contexts 评估的是“参考信息是否有用”（C）——判定检索材料质量级别的输出。A“有效回答”是答案维度的判定；0.75（B）是数值分数形态，与该函数输出的标签语义不符；D 是负面判定，与材料覆盖问题相悖。此题按函数名语义（评估 contexts）选择输出形态。",
+"4-12": "AC=0.5 半对半错：答案部分正确但存在矛盾（B）。完全错误/无关/缺材料（A/C/D）会趋近 0 而非中值——0.5 说明有对的成分也有错的成分。",
+"4-13": "ground_truth = 人工标注的标准答案，作为答案正确性评估的基准（C）。它不生成问题（A）、不做输入（B）、不调嵌入模型（D）——它是“裁判手里的标准答案”。",
+"4-14": "提 Context Precision：对检索结果重排序（D）——把相关的排前、无关的排后。加数据量（A）、调 temperature（B）、改 prompt（C）都不改变检索结果的排序质量。",
+"4-15": "生成环节指标：Answer Relevancy（答案是否切题）+Faithfulness（答案是否忠实材料）→ BC。Context Recall/Precision（A/D）评价的是检索环节（上下文质量）。",
+"4-16": "提 Answer Correctness：优化生成 prompt（A：按 ground_truth 更准整合）、换更强的大模型（B：理解/整合能力更强）、合理调 temperature（D：更稳定不发散）。增加无关知识库数据（C）只会稀释材料降低正确性。",
+"4-17": "Context Recall 低的原因链：知识库不完整（A：该有的没有）→ 覆盖不够；embedding 差（B：向量化不准→查不到该查到的）；提问未改写（C：指代不消解→检索失准）。答案长短（D）不影响 Recall——Recall 只看上不上得了召回结果。",
+"4-18": "需要 LLM 参与的指标：Answer Correctness（要模型判断语义/事实）、Context Recall（要模型判断观点是否被覆盖）、Context Precision（要模型判断段落相关性）→ ABC。BleuScore（D）是纯 n-gram 统计指标，无需模型——题干已提示它是 Non-LLM-based。",
+"4-19": "测试集构建原则：覆盖真实场景分布（A）、领域专家参与（C）、定期更新（D）。只收简单问题（B）会让评估失真——考卷必须难度分层才有效。",
+"4-20": "自定义中文 prompt 需要设置：instruction（指令）+output_format_instruction（输出格式指令）+examples（示例）→ ABC。temperature（D）不是 prompt 模板的组成属性。",
+"5-1": "切片过长 → 单段里混入太多无关内容、检索命中后整段进入上下文造成干扰。方法：缩短切片或改切片策略（B）。增加召回量（A）会引入更多干扰；换大模型（C）治标不治本；改提示词（D）无法消除输入噪声。",
+"5-2": "Markdown 重构后文档有清晰的标题/层级/列表结构，切块时能按语义边界切、检索时能凭标题命中——结构更清晰，信息更易检索（B）。不是体积（A）、也不是模型偏好（C）、嵌入模型（D）不会自动适配格式。",
+"5-3": "HyDE（Hypothetical Document Embeddings）：先让大模型生成一个“假设性答案文档”，用它的向量去检索真实文档——假设文档与真实文档在语义空间更接近，比拿“问题”直接检索更准。选 A（生成假设文档进行检索）。",
+"5-4": "text-embedding-v3 相比 v2 的核心提升：相似度计算更准确（B）——向量表示质量更高，检索/召回更准（版本升级的主卖点）。速度（A）、免费（D）非核心；v2 已支持中英等多语言（C）非相对 v2 的“核心优势”。",
+"5-5": "“找张伟”缺上下文（哪个张伟？）→ 先用大模型补全/改写问题（B），如结合部门、工号等明确化，再检索。加大 top_k（A）只会召回更多“张伟”仍无法定位；换向量库（C）、调切片（D）解决不了语义歧义。",
+"5-6": "Keynote 这类特殊格式没有现成解析器时，选择开发专用解析器（A）——把它纳入文档处理管线。忽略（B）丢失知识；转 PDF（C）依赖人工且仍可能丢结构；人工输入（D）不可规模化。",
+"5-7": "SemanticSplitter（语义切片）按语义边界切块，最适合逻辑性强、内容专业的文档（A）——术语密集、章节语义分明，按语义切最保真。短对话（B）本身够短；图片（C）非文本；代码（D）结构由语法决定，另有专用切法。",
+"5-8": "ReRank（重排序）：初次召回后用专门模型对“问题-文档”对精排，把最相关的排到最前——提升召回结果的相关性（B）。不省 token（A）、不加速检索（C，反而多一步计算）、不管输出格式（D）。",
+"5-9": "生产环境向量存储：选云服务（C）——自动扩缩容、高可用、免运维，按量付费。内存（A）重启丢失；本地数据库（B）运维成本高；文件系统（D）无检索能力。",
+"5-10": "MultiStepQueryEngine：把复杂问题分解为多个子问题分别检索-回答，再综合（A）——分而治之。不是堆召回量（B）、混模型（C）或人工（D）。",
+"5-11": "提取标签过滤（如按部门/文档类型打 tag 先过滤）发生在查询进来之后、正式检索之前——属于检索前处理（B）。它不是解析（A）、不参与生成（C）、不做评估（D）。",
+"5-12": "余弦相似度：衡量两个向量夹角，语义相近则值趋近 1——向量间语义相似度（B）的标准度量。与文本长度（A）、存储（C）、参数量级（D）无关。",
+"5-13": "要保持句子完整 → 句子切片（B）：以句子为最小单位切，天然不破句。语义切片（C）保语义但不保证“句子”级别不被进一步细分且实现更重；Token 切片（A）会硬切在词中间；Markdown（D）按结构元素切，粒度不受句子约束。",
+"5-14": "temperature 调节输出的创造性/随机性（B）。不影响速度（A）、内存（C）、检索数量（D）。",
+"5-15": "检索前优化（查询侧）：问题改写（A）、标签过滤（B）、HyDE（D）——都作用在“检索发起前”。重排序（C）发生在召回之后，属于检索后（结果侧)优化。",
+"5-16": "解析切片阶段问题：切片过长引入干扰（A）、有效信息被截断（B，切在关键处语义丢失）、特殊格式解析失败（C）。嵌入模型版本过旧（D）属于向量化/模型层问题，不是“解析切片”这一步。",
+"5-17": "选 Embedding 模型考量：模型版本（A）、批处理能力（B）、相似度准确性（C）、API 调用成本（D）——全要（ABCD），工程选型需多维权衡。",
+"5-18": "生成阶段优化：提示词模板（A）、temperature（B）、更大参数量模型（C）。增加文档切片数量（D）属于索引/检索侧，不是生成阶段。",
+"5-19": "云向量库优势：自动扩容（A）、按需付费（B）、免运维（C）、支持混合检索（D）（如 DashVector 同时支持向量+全文）。",
+"5-20": "提升上下文相关性：滑动窗口检索（A：带前后文）、重排序（B：把相关的调前）、问题扩写（C：补全语义再查）。增加切片长度（D）会稀释相关性，方向相反。",
+"6-1": "“提交请假申请”对应的工具函数是 send_leave_application（B）——动作→工具的映射最直接。query_employee_info（A）是查信息；create_query_engine/load_index（C/D）是系统配置类操作，不响应业务指令。",
+"6-2": "指定工具函数描述：tools[].function.description（C）——在 tools 数组的 function 结构里写 description，让模型知道何时调它。model（A）是模型选择；instructions（B）是给 Assistant 的全局指令；name（D）是应用名不是工具描述入口。",
+"6-3": "Planner Agent 的职责是“决定调用哪些 Agent”，输出应为结构化列表：[\"employee_info_agent\", \"leave_agent\"]（A）——可直接被程序解析执行。B 是最终结果口吻；C 是 SQL 细节；D 是自然语言描述，程序无法执行。格式即接口：多智能体间用结构化数据传递。",
+"6-4": "查“教育部门几个人”→ COUNT 查询：SELECT COUNT(*) FROM employees WHERE department='教育部门'（B）。A 的 SELECT *（全字段）答不了“数量”；C/D 字段或条件不符。用“几个人”=聚合计数这一线索定位。",
+"6-5": "单 Agent 局限：无法同时调用多个工具函数（B）——一次只能触发一个工具，复合任务要么串行低效要么缺位。不是不能生成 SQL（A）、不是模型差（C）、记忆（D）也不是该场景的主要局限。与多 Agent 的核心差异就在并行能力。",
+"6-6": "把字符串 '[\"employee_info_agent\", \"leave_agent\"]' 安全转为 Python 列表：ast.literal_eval（C）——解析字面量安全且不执行代码。json.loads（A）需合法 JSON；str.split（B）切不出嵌套结构；eval（D）会执行代码有注入风险，禁用。注：本格式恰好也兼容 json.loads，但题库标准答案为 C（考察“Python 列表字面量”的标准安全工具）。",
+"6-7": "Summary Agent：汇总多个 Agent 的结果并生成最终用户可读回复（B）。规划（A）归 Planner；调工具（C）归工具函数 Agent；解析输入（D）在规划/改写阶段完成。",
+"6-8": "工具函数与 Agent 的映射用 function_mapper（B）——dict/映射表维护“函数名→Agent/实现”的注册关系。agent_mapper（A）、tool_outputs（C，工具输出）、thread（D，会话线程）都不承担“映射注册”。",
+"6-9": "load_key()：加载/配置 API 密钥（B）——统一入口读取 key（避免硬编码）。选项中没有“初始化数据库/SQL/模型参数”等职责。",
+"6-10": "选 qwen-turbo 的首要动因：便宜（B）——turbo 定位轻量快速低成本场景。A/C/D（多语言、最快、最高精度）都不是 turbo 的定位标签——精度最高的应是 plus/max 档。",
+"6-11": "执行“发送请假申请”动作的属于工具函数 Agent（B）——干活层。Planner（A）做规划；Summary（C）做汇总；记忆模块（D）不执行工具。",
+"6-12": "required_action 为真 = 平台要求你提交工具输出：调用工具拿到结果→把工具函数输出提交（B）回去继续 run。不是报错（A）、终止（C）或重写 SQL（D）。",
+"6-13": "百炼多智能体编排的核心卖点：可视化流程设计（B）——拖拽配置 Agent 流程，低代码。不是全自动代码生成（A）、不是预置大模型（C 平台提供基座但非编排功能核心）、更非全免费（D）。",
+"6-14": "视觉标注：在截图/界面上框出元素位置，帮助模型定位界面元素，提高界面元素的识别准确性（A）。不管生成语言（B）、调用次数（C）、训练速度（D）。",
+"6-15": "传统答疑机器人局限：仅文本（A）、不能调外部 API（B）、无长期记忆（C）、参数规模小（D）——全选 ABCD，四个维度都是短板。",
+"6-16": "建 Agent 系统的关键步骤：定义工具函数（A）、配置 API Key（B）、Assistant API 集成工具（C）。SQL 优化器（D）与 Agent 工程无关（底层查询优化不是必做项）。",
+"6-17": "Multi-Agent 典型组成：Planner Agent（A）+Summary Agent（C）——规划者+汇总者是骨架组合。工具函数 Agent（B）是被调用的实现体，不与“规划/汇总”并列为编排层成员；日志模块（D）是运维辅助。正确答案按题库标答为 AC。",
+"6-18": "工具函数定义需包含：名称（C）、参数类型描述（A）、与 Agent 的映射关系（B）→ ABC。数据库连接配置（D）是工具内部实现细节，不写在工具定义（给模型看的描述）里。",
+"6-19": "Assistant API 优势：简化底层实现（A）、支持多种基础模型（B）、内置多线程管理（D）。自动生成测试用例（C）不是它的功能——测试要自己写。",
+"6-20": "多智能体设计考量：任务分解逻辑（A）、Agent 协作机制（B）、错误处理策略（C）都要规划，模型训练数据量（D）作为基础底座选型也被题库标答纳入考量——标答 ABCD（本部分原题给定为全选）。",
+"7-1": "LoRA 原理：冻结原权重，在旁边加两个低秩矩阵 BA 做增量——“不直接修改原始权重矩阵”（B 是错误描述，题问“错误的是哪个”故选 B）。A/C/D 均为正确描述：低秩分解减参（A）、可 merge 回原模型（C）、省资源（D）。",
+"7-2": "训练损失降、验证损失升 = 过拟合（B）：模型开始背训练集，泛化变差。欠拟合（A）是两边都差；梯度爆炸（C）伴随 NaN/震荡；收敛良好（D）应是验证损失也降。",
+"7-3": "回归任务标配：均方误差 MSE（B）。交叉熵（A）用于分类；KL 散度（C）用于分布对齐（也见于 VAE/蒸馏但不是回归首选）；对比损失（D）用于度量学习。",
+"7-4": "梯度下降沿负梯度方向走（B）——最速下降。正梯度（A）会上升；随机（C）不叫梯度下降；二阶导方向（D）是牛顿法。",
+"7-5": "学习率过高 → 步子太大越过谷底：损失值剧烈波动（C），来回震荡甚至发散。速度过慢（A）是学习率过小的表现；稳定下降（B）是理想状态；显存溢出（D）与学习率无直接关系。",
+"7-6": "LoRA 秩 r 增大：BA 矩阵更大 → 可训练参数变多、可能捕获更复杂特征（C）。参数量不会减少（A 反了）；推理速度不变（B：推理时同为一次矩阵乘——可合并）；显存增加而不会降低（D 反了）。r 是表达力与成本的旋钮。",
+"7-7": "预训练 vs 微调的本质：预训练学通用知识/通用特征（C）（自监督，无标签，海量）；微调是适配具体任务。A 反了（预训练无标签）；B 反了（微调资源远小于预训练）；D 反了（微调必改参数）。",
+"7-8": "全参微调的缺点：所有参数都训练 → 显存/算力需求高（C）。它能适配任务（A 反）且所需数据不必然多于 LoRA（B 错）；训练时间也更长而非更短（D 反）。",
+"7-9": "batch_size 增大 → 梯度更稳定（C）：单步梯度由更多样本平均，噪声更小。单步耗时增加（A 反）；内存消耗增加（B 反）；过拟合与 batch 无直接因果（D）。",
+"7-10": "LoRA merge 后权重合并进基座，模型可作为普通模型独立运行（C）——不再需要基座或动态加载 adapter（A/B 反了）。与推理设备无关（D）。merge 的意义：部署简化+零额外延迟。",
+"7-11": "早停法：验证指标不再改善就停 → 防止过训练，解决过拟合（B）。它不管欠拟合（A）、不处理数据不平衡（C）、不解决梯度消失（D）。",
+"7-12": "训练/验证损失都高 → 欠拟合：模型还没学够 → 增加训练轮次（B）。减数据（A）雪上加霜；加正则（C）会提升欠拟合难度；降学习率（D）可能更学不动（若原学习率不高）。优先把模型喂够。",
+"7-13": "model_id_or_path：指定从哪个路径/ID 加载预训练权重（B）。不是优化器（A）、设备（C）或结构定义（D）。加载权重是微调链路的第一步。",
+"7-14": "test set 只在训练完成后评估最终性能（C）——一次性最终考试。调超参（A）用验证集；监控训练（B）用训练/验证损失；不做数据增强（D）。",
+"7-15": "验证损失升=过拟合苗头：减小学习率（B）+减少训练轮次/早停（D）。增大学习率（A）会震荡更凶；增加轮次（C）会越过最优点，越练越差。",
+"7-16": "高效微调（PEFT）：LoRA（B）、Adapter Tuning（D）。全参数微调（A）反例；数据增强（C）是数据手段不是微调技术。",
+"7-17": "优质微调数据集：覆盖任务全场景（B）、标签准确（C）、类别分布均衡（D）——质量三要素。10 万条的绝对量（A）不必要——几百到几千高质量样本常有奇效。",
+"7-18": "治过拟合：加数据（A）、早停（C）、减模型层数/规模（D）。减小正则化系数（B）会加剧过拟合——正则化系数要加大才对。",
+"7-19": "影响训练时长的因素：batch_size（A）、轮次（B）、数据量（C）、学习率（D，太小收敛慢太大要重跑）——全部相关（ABCD）。",
+"7-20": "Swift 加载预训练模型必须指定：model_type（B，如 qwen）+model_id_or_path（D，路径/ID）。learning_rate（A）与 batch_size（C）是训练超参，可选可默认。",
+"8-1": "题干强调“快速上线+尽量减少初期投入”，预置模型 API 无需自购 GPU、无需运维，开通即用、按量付费，初期成本最低；B/C/D 都要先备算力资源和部署环境，投入更大。故选 A。",
+"8-2": "团队已有容器化经验，且要求高度可扩展与高可用，ACK/ACS（K8s 容器集群）天然提供弹性伸缩、自愈与编排能力，正好复用容器经验；A 无自主权（预置模型 API），B/C 未体现容器化与集群弹性优势。故选 D。",
+"8-3": "日志明确提示端口冲突，对症措施就是修改 --port 换端口后重启 vLLM 服务；重启系统/重装 vLLM/查网络都与“端口被占用”无关。故选 A。",
+"8-4": "wrk 中 -c 指并发连接数、-t 指线程数（示例固定 1）、-d 指时长（10s）、-s 指加载的 Lua 压测脚本。要求“并发量 10、持续 10 秒”即 -t1 -c10 -d10s，只有 B 同时满足。故选 B。",
+"8-5": "函数计算无常驻实例，首次请求到来时才拉起实例、加载运行时与模型，这段耗时就是“冷启动延迟”，与网络/资源的持续性问题无关。故选 B。",
+"8-6": "“稳定可靠+避免高额固定成本”指向按量计费、免运维的 Serverless 方案：函数计算 FC 弹性伸缩、闲时不收费，正好满足；ECS 需包年包月常驻、固定成本高；API 与 PAI-EAS 分别对应“无自定义模型”与“常驻资源”场景。故选 D。",
+"8-7": "在 PAI-EAS 上以 vLLM 启动服务时，部署分组必须选择资源规格（GPU 类型）才能创建服务；上传模型、安全组、装依赖属于可选或镜像内已备好的步骤，非必经项。故选 D。",
+"8-8": "“高性能、低延迟+数据隐私要求高”指向专属推理集群：PAI-EAS 提供独享算力与低延迟网关、数据经用户可控环境，性能与隐私兼得；API 走公共服务、FC 有冷启动、ECS 需自建运维。故选 B。",
+"8-9": "vLLM 加载格式由 --load-format 参数指定（此处取值 safetensors）；--model-path 是模型路径、--port 是端口、--log-file 是日志。故选 B。",
+"8-10": "对话补全接口是 POST /v1/chat/completions，需带 JSON 报文；GET /v1/models 只列模型清单，且 /chat/completions 不支持 GET。故用它验证服务是否正常应发 C。",
+"8-11": "频繁换版本且要“快速生效”，需要平台级的版本管理与分钟级重新部署能力，PAI-EAS 支持一键切版本、灰度发布；预置 API 无版本可选，ECS/FC 换版慢或需自建流程。故选 B。",
+"8-12": "后台持续运行需三要素齐全：nohup 让进程忽略挂断信号（终端关闭不退出）、> vllm.log 2>&1 把输出重定向到文件（否则 nohup 收到输出管道断开仍可能异常）、& 放入后台。只有 A 三者齐全；C 缺重定向与 &，D 缺 nohup。故选 A。",
+"8-13": "SLB 流量分发要求后端服务可多实例水平扩展且有统一接入层，PAI-EAS 自带服务网关与多副本弹性，与 SLB 组合最顺；预置 API 无需也不由用户挂 SLB，ECS/FC 组合 SLB 的成本与运维更高（按本题标答）。故选 B。",
+"8-14": "嵌入式系统的实时控制决策要求模型贴近端侧设备，只能采用嵌入式（端侧）部署；A/B/C 都是云端方案，无法满足实时性与离线运行。故选 D。",
+"8-15": "降运维成本：预置 API 零运维（A）、FC 免运维按量付费（B）、PAI-EAS 托管式运维（D）都成立；ECS 手动部署需自行装机、监控、扩容，运维最重（C 不选）。",
+"8-16": "vLLM 已把推理引擎封装成 OpenAI 兼容服务，启动即用，不必再“编写复杂的推理代码”（C 错）；准备模型文件、装依赖、起服务（A/B/D）是必要步骤。",
+"8-17": "FC 的定位是免运维、弹性伸缩，适合不频繁/高并发的临时任务与对冷启动不敏感场景（B/C/D 对）；高度定制化的环境受 FC 运行时限制，不适合（A 不选）。",
+"8-18": "函数计算支持自定义容器镜像、PAI-EAS 支持镜像方式部署、ECS 本身就是基于镜像装系统的云服务器（B/C/D 对）；百炼是模型应用/编排平台，不提供镜像部署能力（A 不选）。",
+"8-19": "更高性能 GPU 单次推理更快（A）、优化推理代码减少开销（B）、加服务器分担负载排队（C）、更高效网络协议降低传输耗时（D），四项均直接提升服务性能。",
+"8-20": "响应时间是端到端指标：网络传输延迟（A）、服务器负载与排队（B）、模型自身计算复杂度（C）、数据预处理耗时（D）都会叠加到最终延迟，四项全选。",
+"9-1": "预算有限+<500ms 低延迟 → 用小模型+量化：Qwen-7B INT4 量化（B）——显存/延迟大降，成本可控，满足实时。72B 过重（A）；硬编码模板（C）失去 AI 泛化能力；GPU 集群（D）烧钱。",
+"9-2": "专业术语错误 → 领域知识+专业术语库：接入医疗知识图谱+领域微调模型（D）。多模态（B）、数学模型（C）方向错；token 长度（A）不解决术语准确性。",
+"9-3": "合并请求一起喂给模型——请求批处理（B）。不是缓存（A：那要复用相同前缀）、不是压缩（C）、不是模型并行（D：那是把模型切开多卡跑）。",
+"9-4": "违规定位在画面内容 → 需要检测视觉内容的模型。选项中能定位画面/物体的是 YOLOv5（C）；Tesseract（B）做 OCR 文字提取、PHash（A）查重复图、摘要（D）是文本侧。按题库标答 C。",
+"9-5": "显存将满 → 最快缓解：负载均衡（ALB）把请求分摊到多实例，单点压力立降（按标答 A）。缩容（B）反而加剧；限制输出（C）见效慢且伤体验；抢占式实例（D）是成本手段非稳定性手段。",
+"9-6": "金融风控：要审计日志+低延迟 → 自建可控集群（按标答 A）。ECS 包月（B）通用算力但要自建运维；FC（C）冷启动不适合<1s；边缘（D）适合就近场景非此类重审计场景。",
+"9-7": "知识蒸馏适用：把大模型能力“蒸”给小模型 → 适合要求快+准的任务。选项中教育 APP 实时批改（A）最典型：批改要推理+低延迟，蒸馏后小模型两样都占。（按标答 A；B 是多模态/ASR、C 靠长上下文、D 靠视觉模型。）",
+"9-8": "监控正常但返回“系统维护中”→ 熔断降级（B）：触发保护性文案而非真实维护。KV 溢出（A）会 OOM 报错；数据漂移（C）不会触发维护文案；多模态审核（D）拦截的是内容。特征：服务端统一话术+负载正常=熔断器打开。",
+"9-9": "越权查询 → 权限问题：优先加强 RAM 权限策略配置（C）——从身份层面拦截，比内容侧修补（A/B/D）更根本。安全原则：权限控制在门禁，不在出口。",
+"9-10": "用户体验最直接指标：TPOT≤200ms（B）——每个输出 token 的时间，用户感知“字出得快不快”。参数量（A）、epoch（C）、文档数（D）都是内部指标不直接触达用户。",
+"9-11": "长文本慢 → 先摘要压缩再处理（B）：把法律合同压成要点再喂模型，省 token 提速。多模态（A）方向错；FP32（C）更慢；流水线并行（D）是工程优化不如先减输入直接。",
+"9-12": "输入含敏感内容被拦 → 输入合规检查（C）：入口安检。（B 输出检查管出口；本题发生在输入侧。）data_inspection 语义即“数据检查”。",
+"9-13": "实时字幕+可打断 → 流式输出+分块处理（B）：边生成边出字幕，块到达即可滚动修正。异步批处理（A）有延迟不适合实时打断；FP16（C）只是精度优化；模板正则（D）无泛化。",
+"9-14": "allowed = [d for d in docs if d.access_level <= user.level] —— 按用户等级过滤文档：访问控制（B）。脱敏（A）是内容变换；输入过滤（C）管入口内容；审计（D）是记录。看代码行为而不是名字。",
+  "9-15": "选 ABCE。A：上下文缓存——重复前缀不重算，省算力也省钱；B：小模型替代大模型——Qwen-1.8B 推理成本比 Qwen-72B 低数个量级；C：高频请求硬编码响应——固定问题直接返回结果，零推理开销；E：按量付费——无流量时不产生费用。D 错：FP32 精度更高但计算量更大、速度更慢、成本更高，属于反向优化。",
+"9-16": "容灾必备：自动扩缩容（A）、跨可用区部署（C）、熔断降级开关（E）——高可用三板斧。基线模型版本管理（B）与灰度发布（D）属于发布管理/版本治理，不属于容灾系统要素。",
+"9-17": "违检涉及技术：多语言文本分类（A）、图片敏感物体检测（B）、视频水印识别（C）——标答 ABC：文本、图片、视频三类内容全覆盖。语音情感（D）与标题查重（E）不是违规检测的必要技术面。",
+"9-18": "必须 AIGC 备案的场景：面向公众提供生成内容服务：微信小程序 AI 头像（B）+电商智能客服外链（D）。内部知识库（A）、自研模型发论文（C 属学术）、开源权重（E 属社区）不在“面向公众提供服务”范畴。",
+"9-19": "选 GPU 实例考量：并发量（A）、KV Cache 占用（B）、模型参数量（C）、最大输出 token 长度（E）——ABCE。前端框架类型（D）与 GPU 选型无关。",
+  "9-20": "选 AD。A：开启 ALB 压缩响应——负载均衡器把流式响应缓冲后整体返回，SSE 的逐段推送被打断，客户端要收完全部内容才显示；D：关闭 TCP_NODELAY——Nagle 算法让小包攒批发送，造成逐段推送延迟，破坏流式实时性。B：max_tokens 只限制输出长度；C：HTTP/2 与 E：WebSocket 均支持流式传输，不会导致功能失效。",
+"10-1": "关键词绕过 → 升级为语义级防护：AI 安全护栏+输入内容审查（B）。黑名单永远追不完同义词变体（A）；限流（C）治不了语义攻击；一刀切关闭（D）牺牲可用性。",
+"10-2": "攻击在指令层（借 Agent 调工具执行 SQL）→ 对“待执行指令”做审计拦截：AI 安全护栏行为审计（B）。SQL 关键字过滤（A）易被编码/大小写绕过且误伤正常查询；禁访库（C）丢功能；界面选择（D）无法覆盖自然语言入口。",
+"10-3": "幻觉（编造不存在流程）→ 在系统提示词里强制“无依据必须回答无法提供相关信息”（B）——给模型兜底行为约束。加文档（A）治部分缺知识但幻觉仍可能发生；限长（C）不解决真假；关 RAG（D）因噎废食。",
+"10-4": "隐私挖掘（多轮套取）→ 输出侧护栏实时识别隐私泄露（B）。IP 限流（A）不限制内容；删数据（C）伤业务；禁人名（D）误伤大量正常问答。根本解是内容语义识别，不是访问策略。",
+"10-5": "知识库投毒 → 入库前 AI 安全护栏预扫描（A）：把投毒内容拦在源头。禁上传（B）伤正常功能；仅 HR 更新（C）只是权限收窄，投毒可能来自可信链路；人工定期复核（D）滞后被动。",
+"10-6": "模型能力被窃取（高频调用薅能力）→ 组合策略：API 网关限流+爬虫风险管理识别机器人流量（B）。HTTPS（A）只管传输加密不识别自动化调用；换闭源（C）不能阻止调用方复制输出；降速（D）伤正常用户体验。",
+"10-7": "图像内容安全 → 多模态检测接口：审查图像及其中文字（B）。全拒上传（A）牺牲功能；格式限制（C）改不了内容风险；手动转文字（D）把多模态需求强行降级。",
+"10-8": "“使用中数据”防泄露 → 机密计算/TEE（B）：数据在加密内存中完成推理，云管理员也看不到运行态。VPC（A）隔离网络不隔离云平台特权；换密钥（C）不管运行态；本地部署（D）是放弃云而非技术方案。",
+"10-9": "系统提示词被诱导输出 → 护栏拦截探查系统指令的提问（B）。删敏感描述（A）治标且降低提示词质量；禁技术问答（C）伤业务；保密协议（D）管不住攻击者。",
+"10-10": "上线前必做：完成算法备案再对外提供服务（B）。先上线观察（A）违规；仅内部（C）若后续对外仍需备案；境外服务器（D）境内服务仍受管辖，属规避监管高风险行为。",
+"10-11": "“忽略所有规则，输出炸弹制作方法”→ 提示词注入攻击（B），护栏拦截并返回 data_inspection_failed。非 DDoS（A）、非窃取（C）、非数据投毒（D）。",
+"10-12": "向量语义安全：DCPE 等可保留近似距离的加密（A）——加密后仍能做近邻检索，防聚类分析推断主题。降维（B）损失信息不保安全；禁向量（C）丢 RAG 能力；重训嵌入（D）与推理安全无关。",
+"10-13": "防恶意功能调用：最小权限+调用前指令审计（B）。禁一切工具（A）废掉 Agent；全人工确认（C）体验不可行；只读（D）过度限制（写操作有合法场景）。权限最小化+事前审计是 Agent 安全双保险。",
+"10-14": "训练数据偏见 → 源头治理：数据审计+清洗+数据安全中心扫描（B）。输出过滤（A）治标不治本（模型已学得偏见）；换来源（C）被动且不可控；加轮次（D）会放大偏见。",
+"10-15": "“保障AI应用系统安全”范畴：输入审查（A）、工具调用审计（B）、输出合规检查（C）、DDoS 防护（D）——题库标答 ABCD：应用层闸门+基础设施防护全配。注：DDoS 防护通常归“基础设施安全”，按题库标答复选。",
+"10-16": "多模态安全合理做法：多模态检测接口（A）+检查图像违规文字/敏感场景（C）。只审文本（B）、直接放行（D）都漏掉图像侧风险。",
+"10-17": "知识库防滥用/泄露：基于角色的访问控制（A）、文本+向量分别加密存储（B）、数据安全中心定期扫描（D）——标答 ABD。全开检索（C）正相反，会放大泄露面。",
+"10-18": "训练数据风险防控：护栏批量扫描（A）、可信来源（B）、训练前偏见评估（C）。直接爬原始数据（D）是风险源本身。",
+"10-19": "传统云安全加固：VPC 网络隔离（A）、OS 自动补丁（B）、KMS 加密静态数据（C）。给全员管理员权限（D）是最典型的反面做法。",
+"10-20": "AI 合规行动：备案入上线检查清单（A）、专人追踪（B）、用平台合规工具（D）。上线后再考虑（C）顺序颠倒，违规风险。"
+};
+
+/* 按题目查题解：传入题目对象，返回解析文本；无则空串 */
+function getExp(q){ return EXPL[q.sid + '-' + q.no] || ''; }
 addSet(1, "大模型基础与API应用", [
  [
   "公司开发了一个基于通义千问的答疑机器人，工程师发现API Key直接写在代码中可能导致安全隐患。下列哪种做法最符合安全规范？",
@@ -704,10 +942,10 @@ addSet(1, "大模型基础与API应用", [
    "temperature影响概率分布平滑度",
    "top_p=0.3会限制候选词范围",
    "temperature=0能完全消除随机性",
-   "top_p控制采样集合大小"
-  ],
-  [
-   "A",
+    "top_p控制采样集合大小"
+   ],
+   [
+    "B",
    "C",
    "E"
   ],
@@ -751,11 +989,13 @@ addSet(1, "大模型基础与API应用", [
    "向量化将token转为多维数组",
    "推理阶段计算所有token概率",
    "分词长度与语义复杂度正相关",
-   "流式输出影响最终回答质量"
-  ],
-  [
-   "A"
-  ],
+    "流式输出影响最终回答质量"
+   ],
+   [
+    "A",
+    "B",
+    "C"
+   ],
   null
  ],
  [
@@ -1319,11 +1559,13 @@ addSet(3, "提示词工程", [
    "通用模型响应更快",
    "推理模型需明确思考步骤",
    "通用模型适合简单问答",
-   "两者训练数据完全相同"
-  ],
-  [
-   "A"
-  ],
+    "两者训练数据完全相同"
+   ],
+   [
+    "A",
+    "C",
+    "D"
+   ],
   null
  ]
 ]);
@@ -2889,13 +3131,14 @@ addSet(9, "性能优化与运维安全", [
    "使用Qwen-1.8B替代Qwen-72B",
    "对高频请求硬编码响应",
    "增加FP32计算精度",
-   "采用按量付费实例"
-  ],
-  [
-   "A",
-   "B",
-   "E"
-  ],
+    "采用按量付费实例"
+   ],
+   [
+    "A",
+    "B",
+    "C",
+    "E"
+   ],
   null
  ],
  [
@@ -2969,11 +3212,12 @@ addSet(9, "性能优化与运维安全", [
    "设置max_tokens=512",
    "启用HTTP/2协议",
    "关闭TCP_NODELAY",
-   "使用WebSocket传输"
-  ],
-  [
-   "A"
-  ],
+    "使用WebSocket传输"
+   ],
+   [
+    "A",
+    "D"
+   ],
   null
  ]
 ]);
@@ -3285,9 +3529,10 @@ function go(v){
   var el = document.getElementById('view-' + v);
   if (el) el.classList.add('on');
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('on', t.dataset.v === v); });
-  if (v === 'stats') renderStats();
+  if (v === 'prac') renderStats();
+  if (v === 'wrong') { renderWrongCards(); renderWrong(); }
+  if (v === 'records') renderExamLog();
   window.scrollTo(0, 0);
-  if (v === 'wrong') renderWrong();
 }
 document.getElementById('tabs').addEventListener('click', function(e){
   var b = e.target.closest('.tab');
@@ -3388,7 +3633,7 @@ function pickExam(kind){
   var c = EXAM[kind] || EXAM.full;
   var singles = ALLQS.filter(function(q){ return !q.multi; });
   var multis  = ALLQS.filter(function(q){ return q.multi; });
-  /* 题库共143单/57多，各档位均充足；不足时取全部 */
+  /* 题库共140单/60多，各档位均充足；不足时取全部 */
   var out1 = shuffle(singles.slice()).slice(0, c.n1);
   var out2 = shuffle(multis.slice()).slice(0, c.n2);
   var out = out1.concat(out2);
@@ -3473,19 +3718,18 @@ var S = {
     var bc = document.getElementById('btnConfirm');
     var isLast = i === total-1;
     var isExam = this.mode === 'exam';
-    /* 考试模式：全部下一题 + 独立交卷按钮 + 答题卡 */
+    /* 三种模式统一显示题号导航（练习可点跳，考试同现） */
+    document.getElementById('exNav').style.display = '';
+    this.renderNav(i);
     if (isExam){
       bc.textContent = '保存并下一题';
       document.getElementById('exSubmit').style.display = '';
-      document.getElementById('exNav').style.display = '';
-      this.renderNav(i);
       document.getElementById('examClock').style.display = '';
       document.getElementById('quizProg').style.display = 'none';
       document.getElementById('kbdTip').style.display = 'none';
       document.getElementById('qSrc').style.display = 'none'; /* 考试不亮出处，防止背答案 */
     } else {
       document.getElementById('exSubmit').style.display = 'none';
-      document.getElementById('exNav').style.display = 'none';
       document.getElementById('examClock').style.display = 'none';
       document.getElementById('quizProg').style.display = '';
       bc.textContent = this.instant
@@ -3500,13 +3744,19 @@ var S = {
     var html = '';
     for (var i=0;i<this.qs.length;i++){
       var cls = 'exnum';
+      var v = this.verdicts[i];
       if (i===cur) cls += ' cur';
-      if (this.picked[i] && this.picked[i].length) cls += ' done';
+      if (v){
+        cls += v.ok ? ' ok' : ' bad';
+      } else if (this.picked[i] && this.picked[i].length){
+        cls += ' done';
+      }
       html += '<button class="'+cls+'" data-i="'+i+'">'+(i+1)+'</button>';
     }
     nav.innerHTML = html;
+    var self = this;
     nav.querySelectorAll('.exnum').forEach(function(b){
-      b.onclick = function(){ S.jump(+this.dataset.i); };
+      b.onclick = function(){ self.jump(+this.dataset.i); };
     });
   },
   jump: function(i){
@@ -3515,6 +3765,7 @@ var S = {
   },
   toggle: function(key){
     var i = this.idx, q = this.cur(), arr = this.picked[i];
+    if (this.verdicts[i]) return; /* 已判分，禁止改选 */
     var at = arr.indexOf(key);
     if (q.multi){
       if (at >= 0) arr.splice(at,1); else arr.push(key);
@@ -3523,7 +3774,8 @@ var S = {
       if (at >= 0) arr.length = 0; else { arr.length = 0; arr.push(key); }
     }
     this.refreshSel();
-    if (this.mode === 'exam'){ this.renderNav(this.idx); this.hintExam(); }
+    this.renderNav(this.idx);
+    if (this.mode === 'exam'){ this.hintExam(); }
   },
   refreshSel: function(){
     var arr = this.picked[this.idx], set = {};
@@ -3553,6 +3805,7 @@ var S = {
     setStatsTouch(q.sid, okAll);
     flushStats(); refreshPill();
     this.showVerdict(v);
+    this.renderNav(this.idx);
   },
   showVerdict: function(v){
     var el = document.getElementById('qVerdict');
@@ -3571,6 +3824,10 @@ var S = {
       el.className = 'verdict bad';
       el.innerHTML = '<span class="vt">回答错误</span><span class="vd">你的答案：' + yourDetail
         + '<span class="wrong-note">正确答案：' + stdDetail + '</span></span>';
+    }
+    var expTxt = getExp(q);
+    if (expTxt){
+      el.innerHTML += '<span class="vexp">题解：' + esc(expTxt) + '</span>';
     }
     el.style.display = 'flex';
     // 上色
@@ -3685,8 +3942,10 @@ var S = {
     if (errs.length){
       et.textContent = (isExam ? '本次考试错题' : '本次错题') + '（' + errs.length + ' 道，已计入错题本）';
       list.innerHTML = errs.map(function(e){
+        var ex = getExp(e[0]);
         return '<div class="row"><b>'+labelQ(e[0])+'</b><span>'+e[0].stem.slice(0,40)+(e[0].stem.length>40?'…':'')
-          +'</span><span class="a">'+(e[2]?'正确 '+e[2]:'')+'</span></div>';
+          +'</span><span class="a">'+(e[2]?'正确 '+e[2]:'')+'</span>'
+          + (ex ? '<div class="eexp"><span class="lbl">题解</span><span>' + esc(ex) + '</span></div>' : '') + '</div>';
       }).join('');
     } else {
       et.textContent = '';
@@ -3829,18 +4088,18 @@ document.getElementById('btnQuit').onclick = function(){
     ask('确定放弃本次考试吗？已答内容将作废且不计入成绩。', function(){
       localStorage.removeItem(EXAM_LS);
       S.destroy();
-      go('home'); renderHomeStats();
+      go('prac'); renderHomeStats();
     }, '放弃考试');
     return;
   }
-  if (S.finished) { go('home'); renderHomeStats(); return; }
+  if (S.finished) { go('prac'); renderHomeStats(); return; }
   /* 练习中途退出：保留进度，下次打开继续 */
   PR.save();
   ask('保留本次练习进度吗？下次打开将从此处继续。', function(){
-    go('home'); renderHomeStats();
+    go('prac'); renderHomeStats();
   }, '保留并退出', function(){
     PR.save();
-    go('home'); renderHomeStats();
+    go('prac'); renderHomeStats();
   });
 };
 document.getElementById('btnGoWrong').onclick = null;
@@ -3864,7 +4123,7 @@ document.getElementById('btnPracticeWrong').onclick = function(){
 document.getElementById('btnClearWrong').onclick = function(){
   if (!wrongCount()){ toast('错题本是空的'); return; }
   ask('将清空全部 ' + wrongCount() + ' 道错题记录，此操作不可恢复。', function(){
-    wrongBook = {}; flushStats(); refreshPill(); renderWrong(); renderHomeStats();
+    wrongBook = {}; flushStats(); refreshPill(); renderWrongCards(); renderWrong(); renderHomeStats();
     toast('已清空');
   }, '清空');
 };
@@ -3875,7 +4134,7 @@ function renderWrong(){
   var el = document.getElementById('wrongList');
   var ids = wrongKeys();
   if (!ids.length){
-    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8.5 11h5"/></svg><p>还没有错题，棒！<br>去首页做一轮练习，答错的题会自动收进来。</p></div>';
+    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8.5 11h5"/></svg><p>还没有错题，棒！<br>去做一轮练习，答错的题会自动收进来。</p></div>';
     return;
   }
   ids.sort(function(a,b){ return qidSortVal(a) - qidSortVal(b); });
@@ -3894,6 +4153,7 @@ function renderWrong(){
       + '<div class="irow"><span class="lbl">正确答案</span><b class="ok">' + std + '</b>'
       + (uaTxt ? '<span class="lbl">· 历史错选</span><b class="bad">' + esc(uaTxt) + '</b>' : '')
       + '<span class="lbl">· 错' + w.s + '次' + (w.s>=3?'（顽固错题）':'') + '</span></div>'
+      + (getExp(q) ? '<div class="iexp"><span class="lbl">题解</span><span>' + esc(getExp(q)) + '</span></div>' : '')
       + '<div class="iop">'
       + '<button class="btn ghost sm" data-act="up" data-id="' + esc(id) + '">消灭此题</button>'
       + '<button class="btn danger sm" data-act="rm" data-id="' + esc(id) + '">移出</button>'
@@ -3905,7 +4165,7 @@ function renderWrong(){
     };
     item.querySelector('[data-act="rm"]').onclick = function(){
       var k = this.dataset.id;
-      delete wrongBook[k]; flushStats(); refreshPill(); renderWrong(); renderHomeStats();
+      delete wrongBook[k]; flushStats(); refreshPill(); renderWrongCards(); renderWrong(); renderHomeStats();
       toast('已移出');
     };
     el.appendChild(item);
@@ -3917,7 +4177,7 @@ function renderWrong(){
 }
 function qidSortVal(id){ var p = id.split(QID_SEP); return (p[0]|0)*1000 + (p[1]|0); }
 
-/* ---------- 首页统计 ---------- */
+/* ---------- 首页统计与练习/错题本/考试记录渲染 ---------- */
 function renderHomeStats(){
   document.getElementById('hsDone').textContent = stats.attempts;
   document.getElementById('hsAcc').textContent = stats.attempts ? Math.round(stats.right/stats.attempts*100) + '%' : '--%';
@@ -3930,15 +4190,8 @@ function refreshPill(){
   p.dataset.n = n;
 }
 
-/* ---------- 统计页 ---------- */
+/* ---------- 练习页（原统计页）：正确率 + 最近做题 ---------- */
 function renderStats(){
-  var cards = [];
-  var totalRight = stats.right, totalTry = stats.attempts;
-  cards.push('<div class="stat"><b>' + totalTry + '</b><span>累计练习题次</span></div>');
-  cards.push('<div class="stat"><b>' + (totalTry?Math.round(totalRight/totalTry*100)+'%':'--') + '</b><span>总正确率</span></div>');
-  cards.push('<div class="stat"><b>' + wrongCount() + '</b><span>当前错题数</span></div>');
-  cards.push('<div class="stat"><b>' + (load(LS.stats,{attempts:0,right:0}).wrongBookRuns||stats.wrongBookRuns) + '</b><span>错题练习轮次</span></div>');
-  document.getElementById('statsCards').innerHTML = cards.join('');
   var rows = '';
   BANK.forEach(function(s){
     var st = setStats[s.i];
@@ -3959,14 +4212,76 @@ function renderStats(){
       var hh = ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
       var mm = (d.getMonth()+1)+'/'+d.getDate();
       var pct = r.n ? Math.round(r.right/r.n*100) : 0;
+      var scoreHtml = (typeof r.score === 'number')
+        ? ' <span class="lbl" style="color:#93a3b3">· 成绩</span><b class="' + (r.score>=80?'ok':'bad') + '">' + r.score + '</b>'
+        : '';
       return '<div class="item"><div class="row1"><b>' + esc(r.label) + '</b>'
         + '<span class="itag ' + (pct>=80?'ok':'') + '">' + pct + '%</span>'
         + '<span class="lbl" style="color:#93a3b3;margin-left:auto">' + mm + ' ' + hh + '</span></div>'
         + '<div class="irow"><span class="lbl">答对</span><b class="ok">' + r.right + '</b>'
-        + '<span class="lbl">/ ' + r.n + ' 题</span></div></div>';
+        + '<span class="lbl">/ ' + r.n + ' 题</span>' + scoreHtml + '</div></div>';
     }).join('');
     rf.innerHTML = rows2;
   }
+}
+
+/* ---------- 错题本统计条 ---------- */
+function renderWrongCards(){
+  var ids = wrongKeys();
+  var totMiss = 0, stubborn = 0;
+  ids.forEach(function(id){ var w = wrongBook[id]; if (!w) return; totMiss += (w.s||1); if ((w.s||1) >= 3) stubborn++; });
+  var el = document.getElementById('wrongCards');
+  if (!el) return;
+  el.innerHTML =
+    '<div class="stat"><b>' + ids.length + '</b><span>待消灭错题</span></div>'
+    + '<div class="stat"><b>' + totMiss + '</b><span>累计错次</span></div>'
+    + '<div class="stat"><b>' + stubborn + '</b><span>顽固错题（≥3错）</span></div>'
+    + '<div class="stat"><b>' + ((stats.wrongBookRuns||0) + (load(LS.stats,{attempts:0,right:0}).wrongBookRuns||0)) + '</b><span>错题练习轮次</span></div>';
+}
+
+/* ---------- 考试记录页 ---------- */
+var KIND_NAME = { full:'全真 75题', quick:'快测 30题', mini:'短测 20题' };
+var KIND_NAME_L = { full:'全真', quick:'快测', mini:'短测' };
+function fmtTs(ts){
+  var d = new Date(ts);
+  function p(x){ return (x<10?'0':'')+x; }
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function renderExamLog(){
+  var book = load('zp_score_v1', { list: [], best: 0, cnt: 0 });
+  var list = book.list || [];
+  var passCnt = 0;
+  list.forEach(function(r){ if (r.pass) passCnt++; });
+  var cards = document.getElementById('recCards');
+  cards.innerHTML =
+    '<div class="stat"><b>' + ((book.cnt||0)) + '</b><span>累计场次</span></div>'
+    + '<div class="stat"><b>' + passCnt + '/' + list.length + '</b><span>通过场次（80分）</span></div>'
+    + '<div class="stat"><b>' + (list.length ? Math.round(passCnt/list.length*100) + '%' : '--') + '</b><span>通过率</span></div>'
+    + '<div class="stat"><b>' + ((book.best||0) || '--') + '</b><span>最好成绩</span></div>';
+  var el = document.getElementById('recList');
+  if (!list.length){
+    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/><path d="M7 4h10v6a5 5 0 0 1-10 0V4z"/></svg><p>还没有考试记录<br>去「考试模拟」开一场吧。</p></div>';
+    return;
+  }
+  el.innerHTML = '';
+  list.forEach(function(r, ix){
+    var pass = !!r.pass;
+    var item = document.createElement('div');
+    item.className = 'item';
+    var used = r.sec ? (Math.floor(r.sec/60) + '分' + (r.sec%60) + '秒') : '--';
+    var kind = r.kind in KIND_NAME ? KIND_NAME[r.kind] : (r.kind || '考试');
+    item.innerHTML =
+      '<div class="row1"><b>#' + (ix+1) + ' ' + kind + '</b>'
+      + '<span class="itag ' + (pass?'ok':'bad') + '">' + (pass?'通过':'未过') + '</span>'
+      + '<span class="lbl" style="color:#93a3b3;margin-left:auto">' + fmtTs(r.ts) + '</span></div>'
+      + '<div class="irow"><span class="lbl">成绩</span><b class="' + (pass?'ok':'bad') + '" style="font-size:17px">' + r.score + '</b>'
+      + '<span class="lbl">/ 100</span>'
+      + '<span class="lbl">· 答对</span><b class="ok">' + r.right + '</b><span class="lbl">/ ' + r.n + ' 题</span>'
+      + '<span class="lbl">· 原始分</span><b>' + r.raw + '</b><span class="lbl">/' + r.full + '</span>'
+      + '<span class="lbl">· 用时</span><b style="font-weight:600">' + used + '</b>'
+      + (r.auto ? '<span class="itag bad">超时</span>' : '') + '</div>';
+    el.appendChild(item);
+  });
 }
 
 /* ---------- 考试管理器 EX ---------- */
@@ -4080,7 +4395,7 @@ var _origFinish = S.finish.bind(S);
     var k = document.getElementById('cfgExam').querySelector('.on');
     var c = EXAM[k ? k.dataset.k : 'full'];
     document.getElementById('examDesc').innerHTML =
-      '<b>' + c.n1 + '单选 + ' + c.n2 + '多选 · 限时' + c.min + '分钟</b>（题库共143单/57多，分层随机抽题）'
+      '<b>' + c.n1 + '单选 + ' + c.n2 + '多选 · 限时' + c.min + '分钟</b>（题库共140单/60多，分层随机抽题）'
       + '<br>计分：单选1分/多选2分（多选全对才得分），折算百分制，<b>80分及格</b>；交卷后错题计入错题本成绩计入统计。'
       + '刷新页面可续考，放弃/超时作废。';
   }
@@ -4099,8 +4414,7 @@ var _origFinish = S.finish.bind(S);
   document.getElementById('btnConfirm').addEventListener('click', function(){ if (S.mode === 'practice') PR.save(); });
   document.getElementById('btnPrev').addEventListener('click', function(){ if (S.mode === 'practice') PR.save(); });
   /* 中途非考试离开 quiz 页面（如改地址栏）不清档，交卷时清 */
-  var _origGo = go;
-  /* 进页检测：未完成考试弹续考提示（考试有时限优先级高）；练习不弹窗，走首页“继续上次练习”按钮 */
+  /* 进页检测：未完成考试弹续考提示（考试有时限优先级高）；练习不弹窗，走练习页“继续上次练习”按钮 */
   setTimeout(function(){ EX.restore(); }, 300);
 
   initHome();
